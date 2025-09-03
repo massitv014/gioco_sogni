@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF--8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Custode dei Sogni Perduti</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background-image: url('immagini/sfondo.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .intro-screen {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-sizing: border-box;
+        }
+        
+        .game-screen {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+         .scene-bg {
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scene-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+        }
+        
+        .scene-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #ffd700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .story-text {
+            font-size: 1.0em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+
+        .scene-image {
+            max-width: 70%;
+            height: auto;
+            max-height: 35vh;
+            border-radius: 15px;
+            margin: 15px auto;
+            display: block;
+            border: 3px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+         .intro-screen img, #gameContent img {
+            max-height: 50vh;
+            max-width: 70%;
+            object-fit: contain;
+            width: auto;
+        }
+        
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+            width: 70%;
+            margin: 30px auto 0;
+        }
+        
+        .choice-btn {
+            background: linear-gradient(45deg, #4c2a7c, #8a4ca3);
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.0em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+            border-color: #ffd700;
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            color: #1e3c72;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+        }
+        
+        .lives-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.2em;
+            border: 2px solid #fff;
+            z-index: 1000;
+        }
+        
+        .game-over {
+            text-align: center;
+            color: #ff4444;
+        }
+        
+        .victory {
+            text-align: center;
+            color: #44ff44;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a5a);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .dialogue-box {
+            background: rgba(50, 50, 50, 0.95);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .character-name {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .story-text { font-size: 1em; }
+            .choice-btn { padding: 15px; font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="backgroundMusic" loop>
+        <source src="audio/musica_fondo.mp3" type="audio/mpeg">
+    </audio>
+    <div class="game-container">
+        <div id="intro" class="intro-screen">
+            <h1>🌙 Il Custode dei Sogni Perduti 🌙</h1>
+            <div class="story-text">
+                <p><strong>Benvenuto nell'Accademia delle Notti Stellate</strong>, un luogo mistico dove i sogni prendono forma e la realtà si mescola con l'immaginazione.</p>
+                <p>Tu sei <em>Alex</em>, un giovane apprendista custode dei sogni, appena arrivato in questa antica accademia sospesa tra le nuvole. La tua missione è recuperare i <strong>Frammenti di Luna</strong>, preziosi cristalli che mantengono l'equilibrio tra il mondo dei sogni e quello della veglia.</p>
+                <p>Ma qualcosa è andato storto: i Frammenti sono stati rubati da <em>Morfeus l'Ombra</em>, un ex-custode caduto nell'oscurità. Senza di essi, gli incubi iniziano a invadere i sogni delle persone di tutto il mondo.</p>
+                <p><strong>Attenzione:</strong> Ogni scelta che farai influenzerà la tua storia. Hai 3 vite a disposizione, ma alcune decisioni potrebbero costarti cara. Solo la saggezza e l'intuizione ti guideranno verso il successo.</p>
+                <p>Riuscirai a diventare un vero Custode dei Sogni e a salvare il mondo onirico?</p>
+            </div>
+            <img src="immagini/intro.png" alt="Accademia delle Notti Stellate" class="scene-image">
+            <button class="start-btn" onclick="startGame()">🚀 INIZIA L'AVVENTURA</button>
+        </div>
+
+        <div id="game" class="game-screen">
+            <div class="lives-counter" id="livesCounter">❤️ Vite: 3</div>
+            <div id="gameContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let lives = 3;
+        let currentScene = 0;
+        let gameState = {
+            hasKey: false,
+            metWiseSage: false,
+            chosenPath: '',
+            finalChoice: ''
+        };
+
+        const scenes = [
+            { // Scena 0
+                title: "L'Ingresso dell'Accademia",
+                background: "",
+                text: "Ti trovi davanti all'maestoso portone dell'Accademia delle Notti Stellate. Tre sentieri si aprono davanti a te, ognuno avvolto da una misteriosa nebbia colorata. Il vento sussurra antiche melodie e senti che la tua scelta determinerà il tipo di avventura che ti aspetta.",
+                choices: [
+                    { text: "🌟 Prendi il sentiero dorato che brilla di luce propria", correct: true, next: 1 },
+                    { text: "🌙 Segui il sentiero argentato che riflette la luna", correct: true, next: 2 },
+                    { text: "⚫ Imbocca il sentiero nero che emana un'aura inquietante", correct: false, next: -1 }
+                ]
+            },
+            { // Scena 1
+                title: "Il Giardino dei Sogni Lucidi",
+                background: "",
+                text: "Il sentiero dorato ti conduce in un giardino magico dove i fiori cambiano colore seguendo i tuoi pensieri. Al centro del giardino si trova una fontana cristallina con tre chiavi galleggianti. Secondo la leggenda, solo una di esse apre il percorso verso i Frammenti di Luna.",
+                choices: [
+                    { text: "🗝️ Prendi la chiave che pulsa con una luce blu elettrica", correct: false, next: -1 },
+                    { text: "🗝️ Afferra la chiave che emana calore e brilla di rosso", correct: true, next: 3, action: () => { gameState.hasKey = true; gameState.chosenPath = 'garden'; } },
+                    { text: "🗝️ Scegli la chiave trasparente che sembra fatta di ghiaccio", correct: true, next: 4 }
+                ]
+            },
+            { // Scena 2
+                title: "La Biblioteca delle Memorie",
+                background: "",
+                text: "Il sentiero argentato ti porta in una biblioteca infinita dove i libri fluttuano nell'aria e le pagine si voltano da sole. Un saggio bibliotecario con occhi stellati ti si avvicina. 'Giovane custode,' sussurra, 'per procedere devi rispondere al mio enigma.'",
+                dialogue: {
+                    character: "Il Saggio Bibliotecario",
+                    text: "'Io sono ciò che tutti sognano ma pochi raggiungono, ciò che illumina l'oscurità ma può anche accecare. Cosa sono?'"
+                },
+                choices: [
+                    { text: "💭 'La conoscenza suprema e la saggezza'", correct: true, next: 5, action: () => { gameState.metWiseSage = true; gameState.chosenPath = 'library'; } },
+                    { text: "🌟 'Una stella cadente che esaudisce i desideri'", correct: false, next: -1 },
+                    { text: "💎 'Un tesoro nascosto nel cuore dei sogni'", correct: true, next: 6 }
+                ]
+            },
+            { // Scena 3
+                title: "Il Laboratorio Alchemico",
+                background: "",
+                text: "La chiave rossa ti ha portato in un laboratorio alchemico dove pozioni colorate ribollono in caldeironi volanti. Un misterioso alchimista mascherato ti offre tre pozioni. 'Una di queste ti darà il potere di vedere attraverso le illusioni di Morfeus,' dice con voce profonda.",
+                dialogue: {
+                    character: "L'Alchimista Mascherato",
+                    text: "'Scegli saggiamente, giovane custode. Una pozione ti darà la vista oltre il velo, una ti confonderà la mente, e una...' La sua voce si affievolisce misteriosamente."
+                },
+                choices: [
+                    { text: "🧪 Bevi la pozione verde che emana vapori dorati", correct: true, next: 7 },
+                    { text: "🧪 Assaggia la pozione viola che gorgoglia allegramente", correct: false, next: -1 },
+                    { text: "🧪 Prova la pozione blu che riflette le stelle", correct: true, next: 8 }
+                ]
+            },
+            { // Scena 4
+                title: "Il Ponte delle Nuvole",
+                background: "",
+                text: "La chiave di ghiaccio ha creato un ponte di nuvole cristallizzate che si estende sopra un abisso di sogni. Mentre attraversi, tre spiriti guardiani emergono dalle nuvole, ognuno ti offre un dono per la tua missione.",
+                choices: [
+                    { text: "👻 Accetta il dono dello Spirito della Memoria - 'Ti mostrerò il passato'", correct: true, next: 9 },
+                    { text: "👻 Prendi il regalo dello Spirito del Presente - 'Ti rivelerò ciò che è nascosto'", correct: false, next: -1 },
+                    { text: "👻 Ricevi la benedizione dello Spirito del Futuro - 'Ti preparerò per ciò che verrà'", correct: true, next: 10 }
+                ]
+            },
+            { // Scena 5
+                title: "La Camera dei Sussurri",
+                background: "",
+                text: "La tua saggezza ti ha aperto la porta della Camera dei Sussurri, dove le voci di tutti i custodi del passato echeggiano nell'aria. Al centro della stanza, una sfera di luce contiene la mappa per raggiungere Morfeus. Ma le voci ti avvertono di una trappola.",
+                dialogue: {
+                    character: "Le Voci degli Antichi Custodi",
+                    text: "'Ascolta bene, giovane erede. Morfeus ha posto tre guardiani sul tuo cammino. Solo uno di loro ti lascerà passare senza combattere. Quale sceglierai di affrontare?'"
+                },
+                choices: [
+                    { text: "🐉 Affronta il Drago delle Paure - creatura delle ansie più profonde", correct: true, next: 11 },
+                    { text: "🕷️ Combatti il Ragno dell'Inganno - tessitore di bugie e illusioni", correct: false, next: -1 },
+                    { text: "🦅 Confrontati con l'Aquila del Dubbio - che semina incertezze", correct: true, next: 12 }
+                ]
+            },
+            { // Scena 6 - CORRETTA
+                title: "Il Tesoro delle Memorie Perdute",
+                background: "",
+                text: "La tua scelta ti ha portato in una camera del tesoro, ma non è oro quello che luccica. Qui sono custodite le memorie perdute di tutti coloro che hanno dimenticato i loro sogni. Una di queste memorie potrebbe essere la chiave per sconfiggere Morfeus.",
+                choices: [
+                    { text: "💭 Tocca la memoria di un bambino che sognava di volare", correct: true, next: 15 },
+                    { text: "💭 Esplora la memoria di un artista che dipingeva l'impossibile", correct: true, next: 16 },
+                    { text: "💭 Entra nella memoria di un inventore di macchine impossibili", correct: false, next: -1 }
+                ]
+            },
+            { // Scena 7
+                title: "La Pozione della Verità",
+                background: "",
+                text: "La pozione verde ha risvegliato in te il dono della vista spirituale. Ora puoi vedere la vera forma di Morfeus: non è malvagio, ma intrappolato nel dolore di aver perso la capacità di sognare. Per liberarlo, devi trovare il suo cuore nascosto.",
+                choices: [
+                    { text: "💚 Cerca il cuore di Morfeus nei ricordi della sua infanzia", correct: true, next: 13 },
+                    { text: "🖤 Cerca il cuore negli incubi che ha creato", correct: false, next: -1 },
+                    { text: "💙 Cerca il cuore nei sogni che ha rubato ad altri", correct: true, next: 13 }
+                ]
+            },
+            { // Scena 8
+                title: "Il Riflesso dell'Anima",
+                background: "",
+                text: "La pozione blu ti ha mostrato uno specchio magico che riflette non l'aspetto fisico, ma l'essenza dell'anima. Guardandoti, vedi tre possibili versioni del tuo futuro come Custode dei Sogni. Devi scegliere quale destino abbracciare.",
+                choices: [
+                    { text: "🌟 Vedi te stesso come Guardiano della Speranza", correct: true, next: 13 },
+                    { text: "⚔️ Ti vedi come Guerriero contro gli Incubi", correct: true, next: 13 },
+                    { text: "👁️ Ti osservi come Giudice dei Sogni Proibiti", correct: false, next: -1 }
+                ]
+            },
+            { // Scena 9
+                title: "Il Dono della Memoria",
+                background: "",
+                text: "Lo Spirito della Memoria ti ha donato la visione del passato di Morfeus. Ora sai che un tempo era il più gentile tra i custodi, ma un terribile incidente gli fece perdere tutti i suoi sogni personali. La sua caduta nell'oscurità è nata dal dolore, non dalla malvagità.",
+                choices: [
+                    { text: "😢 Prometti di aiutarlo a ritrovare i suoi sogni perduti", correct: true, next: 13 },
+                    { text: "⚖️ Decidi che deve pagare per i suoi crimini, nonostante tutto", correct: false, next: -1 },
+                    { text: "🤝 Proponi di condividere i tuoi sogni con lui", correct: true, next: 13 }
+                ]
+            },
+            { // Scena 10
+                title: "Il Futuro Rivelato",
+                background: "",
+                text: "Lo Spirito del Futuro ti mostra tre possibili finali per la tua missione. In uno, Morfeus viene sconfitto ma il danno ai sogni resta. In un altro, viene redento e diventa tuo alleato. Nel terzo, qualcosa di inaspettato cambia tutto per sempre.",
+                choices: [
+                    { text: "🔮 Chiedi di vedere più dettagli sul futuro di redenzione", correct: true, next: 13 },
+                    { text: "🔮 Vuoi conoscere il destino misterioso e inaspettato", correct: true, next: 13 },
+                    { text: "🔮 Preferisci non conoscere il futuro e agire secondo il cuore", correct: false, next: -1 }
+                ]
+            },
+            { // Scena 11 - CORRETTA
+                title: "Il Confronto con il Drago delle Paure",
+                background: "",
+                text: "Il Drago delle Paure emerge dalle ombre con occhi come pozzi di terrore. Ma invece di attaccarti, ti parla: 'Conosco ogni tua paura, giovane custode. La paura di fallire, di deludere, di non essere abbastanza forte. Ma dimmi, cosa farai di queste paure?'",
+                dialogue: {
+                    character: "Il Drago delle Paure",
+                    text: "'Io sono nato dalle paure di Morfeus quando perse i suoi sogni. Se vuoi salvarlo, devi prima accettare le tue paure. Solo così potrai comprendere le sue.'"
+                },
+                choices: [
+                    { text: "💪 'Trasformerò le mie paure in forza per aiutare gli altri'", correct: true, next: 13 },
+                    { text: "🛡️ 'Combatterò le mie paure fino a sconfiggerle completamente'", correct: false, next: -1 },
+                    { text: "🤝 'Accetterò le mie paure come parte di me, senza vergogna'", correct: true, next: 13 }
+                ]
+            },
+            { // Scena 12 - CORRETTA
+                title: "L'Aquila del Dubbio",
+                background: "",
+                text: "L'Aquila del Dubbio vola in cerchi sopra di te, le sue ali creano vortici di domande senza risposta. 'Sei davvero sicuro di essere nel giusto?' cinguetta con voce melodiosa ma inquietante. 'Come puoi essere certo che salvare Morfeus sia la cosa giusta da fare?'",
+                dialogue: {
+                    character: "L'Aquila del Dubbio",
+                    text: "'Il dubbio non è tuo nemico, giovane custode. È ciò che ti rende saggio. Ma dimmi: quando il dubbio ti assale, come scegli la tua strada?'"
+                },
+                choices: [
+                    { text: "🧠 'Seguo la logica e analizzo ogni possibilità'", correct: true, next: 13 },
+                    { text: "❤️ 'Ascolto il mio cuore e faccio ciò che sento giusto'", correct: true, next: 13 },
+                    { text: "🎲 'Lascio che il destino decida al posto mio'", correct: false, next: -1 }
+                ]
+            },
+            { // Scena 13 - CORRETTA
+                title: "Il Palazzo di Morfeus",
+                background: "",
+                text: "Finalmente raggiungi il Palazzo di Morfeus, un'imponente struttura di cristallo nero che fluttua nelle nuvole tempestose. All'interno, trovi Morfeus seduto su un trono di sogni cristallizzati, i Frammenti di Luna orbitano attorno a lui come satelliti spezzati. Ti guarda con occhi che riflettono infinita tristezza.",
+                dialogue: {
+                    character: "Morfeus l'Ombra",
+                    text: "'Sei arrivato fin qui, giovane custode. Devo ammettere che sono... impressionato. Ma dimmi, dopo tutto quello che hai scoperto, cosa farai ora? Mi condannerai per i miei crimini o... c'è ancora speranza per qualcuno come me?'"
+                },
+                choices: [
+                    { text: "💝 'Ti offro la redenzione e la possibilità di ricominciare'", correct: true, next: "ending_choice" },
+                    { text: "⚖️ 'Devi pagare per quello che hai fatto, ma poi potrai redimerrti'", correct: true, next: "ending_choice" },
+                    { text: "⚔️ 'Ti sconfiggerò e riprenderò i Frammenti con la forza'", correct: true, next: "game_over" }
+                ]
+            },
+            { // Scena 14
+                title: "La Scelta Finale",
+                background: "",
+                text: "Morfeus, commosso dalla tua compassione, si alza dal trono e i Frammenti di Luna iniziano a brillare di una luce pura. 'Hai risvegliato in me la speranza che credevo perduta per sempre,' dice. 'Ora tocca a te decidere il destino di tutti i sogni del mondo. I Frammenti possono essere usati in tre modi diversi.'",
+                dialogue: {
+                    character: "Morfeus",
+                    text: "'Possiamo restaurare l'antico equilibrio tra sogno e realtà, oppure unire i due mondi per sempre, o ancora creare un nuovo tipo di equilibrio mai visto prima. Quale futuro scegli per l'umanità?'"
+                },
+                choices: [
+                    { text: "🌙 'Ripristiniamo l'equilibrio originale - è la scelta più saggia'", correct: true, next: "ending_balance" },
+                    { text: "🌟 'Uniamo sogno e realtà - creiamo un mondo di infinite possibilità'", correct: true, next: "ending_unity" },
+                    { text: "🔄 'Creiamo un nuovo equilibrio, migliore del precedente'", correct: true, next: "ending_renewal" }
+                ]
+            }
+        ];
+
+        // Aggiungiamo scene intermedie per completare i percorsi
+        const extraScenes = [
+            { // Scena 15 - CORRETTA
+                title: "Il Sogno dell'Infanzia Perduta",
+                background: "",
+                text: "La memoria del bambino ti avvolge in una calda sensazione di libertà. Vedi un piccolo Morfeus che corre in un prato infinito, le sue risate echeggiano come campanelli d'argento. Improvvisamente capisci: ha bisogno di ritrovare quella gioia pura, quella capacità di meravigliarsi.",
+                choices: [
+                    { text: "🌈 Porta questa memoria di gioia direttamente a Morfeus", correct: true, next: 13 },
+                    { text: "🎁 Conserva questa memoria per te come fonte di forza", correct: false, next: -1 },
+                    { text: "✨ Trasforma questa memoria in un incantesimo di guarigione", correct: true, next: 13 }
+                ]
+            },
+            { // Scena 16 - CORRETTA
+                title: "L'Arte dell'Impossibile",
+                background: "",
+                text: "La memoria dell'artista ti circonda di colori che non esistono nel mondo reale. Vedi pennellate di emozioni pure che dipingono realtà alternative. L'artista sussurra: 'L'arte vera nasce quando accetti che l'impossibile è solo un'altra forma di possibile.'",
+                choices: [
+                    { text: "🎨 Usa questa arte per ridipingere la realtà di Morfeus", correct: true, next: 13 },
+                    { text: "🖼️ Crea un quadro che mostri a Morfeus la bellezza che ha dimenticato", correct: true, next: 13 },
+                    { text: "🎭 Trasforma te stesso in un'opera d'arte vivente", correct: false, next: -1 }
+                ]
+            }
+        ];
+
+        scenes.push(...extraScenes);
+
+        const endings = {
+            "ending_balance": {
+                title: "🌙 L'Equilibrio Eterno",
+                background: "",
+                text: "Hai scelto la saggezza dell'equilibrio. I Frammenti di Luna vengono restaurati nella loro posizione originale, e Morfeus diventa il Custode del Pentimento, dedicando la sua esistenza a proteggere l'equilibrio che un tempo aveva spezzato. Il mondo dei sogni torna sereno, e tu diventi il nuovo Grande Custode, vegliando sull'armonia tra sogno e realtà. Le persone di tutto il mondo possono finalmente dormire sonni tranquilli, sapendo che i loro sogni sono al sicuro.",
+                victory: true
+            },
+            "ending_unity": {
+                title: "🌟 L'Unione dei Mondi",
+                background: "",
+                text: "La tua scelta coraggiosa cambia tutto per sempre. Utilizzando i Frammenti di Luna, tu e Morfeus unite il mondo dei sogni con quello della realtà. Ora tutti possono toccare i propri sogni, vederli prendere forma nel mondo reale. L'arte, la scienza, l'amore - tutto raggiunge nuove vette impossibili prima. Tu e Morfeus diventate i Co-Custodi della Nuova Realtà, guidando l'umanità in questa meravigliosa trasformazione. È un futuro incerto ma infinitamente pieno di possibilità.",
+                victory: true
+            },
+            "ending_renewal": {
+                title: "🔄 Il Grande Rinnovamento",
+                background: "",
+                text: "La tua visione di un nuovo equilibrio, migliore del precedente, dà vita a una realtà trasformata. I Frammenti di Luna vengono riforgiati per creare il Sistema dei Sogni Condivisi, dove le persone possono scegliere di condividere i propri sogni con altri, creando esperienze collettive meravigliose. Tu e Morfeus diventate i primi Architetti dei Sogni Condivisi, insegnando a tutti come costruire insieme realtà oniriche collaborative. È un mondo dove la creatività e l'empatia fioriscono come mai prima.",
+                victory: true
+            },
+            "game_over": {
+                title: "💀 Game Over",
+                background: "",
+                text: "La tua scelta di attaccare Morfeus con la forza ha portato a una battaglia devastante. Anche se alla fine riesci a sconfiggerlo, i Frammenti di Luna si frantumano nell'impatto, disperdendosi per sempre nel vuoto. Senza di essi, il mondo dei sogni collassa lentamente, e gli incubi iniziano a invadere la realtà. Hai vinto la battaglia, ma perso la guerra. Il mondo sprofonda in un'era di sonno inquieto e sogni spezzati.",
+                victory: false
+            },
+            "game_over_lives": {
+                title: "⌛ Sogni Svaniti nel Tempo ⌛",
+                background: "",
+                text: "La tua avventura è stata piena di pericoli e le tue energie si sono esaurite. I sogni che dovevi proteggere si sono dissolti nell'oscurità e gli incubi si sono diffusi in tutto il creato a causa delle tue scelte sfortunate. Riuscirai a fare meglio la prossima volta?",
+                victory: false
+            },
+        };
+
+        const endingImageMap = {
+            "ending_balance": "finale_equilibrio.png",
+            "ending_unity": "finale_unione.png",
+            "ending_renewal": "finale_rinnovamento.png",
+            "game_over": "finale_game_over.png",
+            "game_over_lives": "finale_vite_esaurite.png"
+        };
+
+        function startGame() {
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            document.getElementById('backgroundMusic').play();
+            lives = 3;
+            currentScene = 0;
+            gameState = { hasKey: false, metWiseSage: false, chosenPath: '', finalChoice: '' };
+            updateLivesCounter();
+            showScene();
+        }
+
+        function updateLivesCounter() {
+            document.getElementById('livesCounter').innerHTML = `❤️ Vite: ${lives}`;
+        }
+
+        function showScene() {
+            const scene = scenes[currentScene];
+            const gameContent = document.getElementById('gameContent');
+            
+            let dialogueHtml = '';
+            if (scene.dialogue) {
+                dialogueHtml = `
+                    <div class="dialogue-box">
+                        <div class="character-name">${scene.dialogue.character}:</div>
+                        <div>"${scene.dialogue.text}"</div>
+                    </div>
+                `;
+            }
+            
+            gameContent.innerHTML = `
+                <div class="scene-bg" style="background: ${scene.background}">
+                    <div class="scene-content">
+                        <h2>${scene.title}</h2>
+                        <div class="story-text">${scene.text}</div>
+                        ${dialogueHtml}
+                    </div>
+                </div>
+                <img src="immagini/scena_${currentScene}.png" alt="${scene.title}" class="scene-image">
+                <div class="choices-container">
+                    ${scene.choices.map((choice, index) => 
+                        `<button class="choice-btn" onclick="makeChoice(${index})">${choice.text}</button>`
+                    ).join('')}
+                </div>
+            `;
+        }
+
+        function makeChoice(choiceIndex) {
+            const scene = scenes[currentScene];
+            const choice = scene.choices[choiceIndex];
+            
+            if (choice.action) {
+                choice.action();
+            }
+            
+            if (!choice.correct) {
+                lives--;
+                updateLivesCounter();
+                
+                if (lives <= 0) {
+                    showEnding("game_over_lives");
+                    return;
+                }
+              
+                const gameContent = document.getElementById('gameContent');
+                gameContent.innerHTML = `
+                    <div class="scene-bg" style="background: linear-gradient(135deg, #FF0000, #000000)">
+                        <div class="scene-content">
+                            <h2 style="color: #ff4444;">❌ Scelta Sbagliata!</h2>
+                            <div class="story-text">
+                                Hai perso una vita! ${getErrorMessage(choice.text)}
+                                <br><br>
+                                Ma non tutto è perduto! Puoi ancora continuare la tua missione.
+                                <br><br>
+                                <strong>Vite rimanenti: ${lives}</strong>
+                            </div>
+                            <img src="immagini/vita_persa.png" alt="Vita persa" class="scene-image">
+                            <button class="choice-btn" onclick="showScene()" style="margin-top: 20px;">🔄 Riprova</button>
+                        </div>
+                    </div>
+                `;
+
+                return;
+            }
+            
+            if (typeof choice.next === 'string') {
+                if (choice.next === "ending_choice") {
+                    currentScene = 14;
+                    showScene();
+                } else {
+                    showEnding(choice.next);
+                }
+            } else if (choice.next === -1) {
+                showScene();
+            } else {
+                currentScene = choice.next;
+                showScene();
+            }
+        }
+
+        function getErrorMessage(choiceText) {
+            if (choiceText.includes('nero') || choiceText.includes('inquietante')) {
+                return 'Il sentiero ti ha condotto in una trappola di incubi.';
+            } else if (choiceText.includes('pozione')) {
+                return 'La pozione ti ha confuso la mente temporaneamente.';
+            } else if (choiceText.includes('paure') || choiceText.includes('combattere')) {
+                return 'Non si può sconfiggere la paura con la forza bruta.';
+            } else if (choiceText.includes('Ragno')) {
+                return 'Il Ragno dell\'Inganno ti ha intrappolato nelle sue bugie.';
+            } else if (choiceText.includes('destino')) {
+                return 'Affidarsi solo al destino è una scelta pericolosa.';
+            } else if (choiceText.includes('forza')) {
+                return 'La violenza non è mai la risposta giusta.';
+            } else {
+                return 'La tua scelta ha avuto conseguenze inaspettate.';
+            }
+        }
+
+        function showEnding(endingKey) {
+            const ending = endings[endingKey];
+            const gameContent = document.getElementById('gameContent');
+            const imageName = endingImageMap[endingKey];
+            
+            gameContent.innerHTML = `
+                <div class="scene-bg" style="background: ${ending.background}">
+                    <div class="scene-content">
+                        <div class="${ending.victory ? 'victory' : 'game-over'}">
+                            <h2>${ending.title}</h2>
+                            <div class="story-text">
+                                ${ending.text}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <img src="immagini/${imageName}" alt="${ending.title}" class="scene-image">
+                <div class="${ending.victory ? 'victory' : 'game-over'}">
+                    <div class="story-text">
+                        ${ending.victory ? 
+                            '<strong style="color: #44ff44;">🎉 MISSIONE COMPLETATA! 🎉</strong><br>Sei riuscito a diventare un vero Custode dei Sogni!' : 
+                            '<strong style="color: #ff4444;">💀 MISSIONE FALLITA 💀</strong><br>Le tue scelte hanno portato a conseguenze inaspettate.'}
+                    </div>
+                    <button class="restart-btn" onclick="location.reload()">
+                        🔄 Ricomincia l'Avventura
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
